@@ -1,4 +1,5 @@
 import numpy as np
+from scipy import fft
 import matplotlib.pyplot as plt
 from pydub import AudioSegment
 
@@ -14,19 +15,20 @@ def read_as_array(fname, ftype="mp3", mono=False):
 
     return np.array(track.get_array_of_samples())
 
-def fft(samples, srate=SAMPLE_RATE):
-    sp = np.fft.fft(samples).real
-    freq = np.fft.fftfreq(samples.shape[-1]) * srate
+def fastFourier(samples, srate=SAMPLE_RATE):
+    yf = np.abs(fft(samples))
+    freq = fft.fftfreq(samples.shape[-1]) * srate
 
-    return np.vstack((freq, sp))
+    return np.vstack((freq, yf))
 
 def plot_track(samples, outFunct=plt.show):
-    fourier = fft(samples)
+    fourier = fastFourier(samples)
 
-    plt.xlim(*PLOT_XLIM)
-    plt.ylim(*PLOT_YLIM)
+    #plt.xlim(*PLOT_XLIM)
+    #plt.ylim(*PLOT_YLIM)
     xs = fourier[0,:]
     ys = fourier[1,:]
 
     plt.plot(xs, ys)
-    plt.savefig("fft.png")
+    outFunct()
+    #plt.savefig("fft.png")
